@@ -19,21 +19,18 @@ router.get("/", async (req, res) => {
 });
 
 // get one subscriber
-router.get("/:id", async (req, res) => {
+router.get("/:id", getSubscriber, (req, res) => {
   try {
-    let subscribers = await Subscriber.find();
-    subscribers = subscribers.find(sub => sub.id === req.params.id);
     res.status(200).send({
-      success: "true",
-      data: [subscribers]
+      succes: "true",
+      data: [res.subscriber]
     });
   } catch (err) {
     res.status(500).send({
-      success: "false",
-      message: err.message
+      succes: "false",
+      message: `Any subscriber with ${req.param.id} finded ...`
     });
   }
-  res.json(subscribers);
 });
 
 // create one subscriber
@@ -58,10 +55,47 @@ router.post("/", async (req, res) => {
 });
 
 // update one subscriber
-router.patch("/:id", (req, res) => {});
+router.patch("/:id", getSubscriber, async (req, res) => {
+  if (req.body.name != null) {
+    res.subscriber.name = req.body.name;
+  }
+  if (req.body.subscribedChannel != null) {
+    res.subscriber.subscribedChannel = req.body.subscribedChannel;
+  }
+
+  try {
+    const updatedSubscriber = await res.subscriber.save();
+    res.status(200).send({
+      success: "true",
+      message: "Subscribed updated",
+      data: [updatedSubscriber]
+    });
+  } catch {
+    res.status(400).send({
+      success: "false",
+      message: err.message
+    });
+  }
+});
 
 // delete one subscriber
-router.delete("/:id", (req, res) => {});
+router.delete("/:id", getSubscriber, async (req, res) => {
+  const cpySubscriber = await res.subscriber;
+  console.log(cpySubscriber);
+  try {
+    await res.subscriber.remove();
+    res.status(200).send({
+      success: "true",
+      message: "Subscriber deleted",
+      data: [cpySubscriber]
+    });
+  } catch (err) {
+    res.status(500).send({
+      succes: "false",
+      message: err.message
+    });
+  }
+});
 
 async function getSubscriber(req, res, next) {
   try {
