@@ -7,6 +7,12 @@ const subscribersRouter = require("./routes/subscribers");
 const app = express();
 
 // middlewares
+app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS,PUT,DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Accept");
+  next();
+});
 app.use(express.json());
 app.use("/subscribers", subscribersRouter);
 
